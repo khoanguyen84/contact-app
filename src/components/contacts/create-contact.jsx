@@ -18,7 +18,7 @@ const schema = yup
         company: yup.string().required(),
         notes: yup.string(),
         avatar: yup.string(),
-        dob: yup.date().required().typeError('dob is a required field')
+        dob: yup.date().required().min('1900-01-01').typeError('dob is a required field')
     })
 
 export default function CreateContact() {
@@ -32,7 +32,7 @@ export default function CreateContact() {
     const handleCreateContact = async (values) => {
         try {
             setIsLoading(true)
-            let res = await fetch('https://662274e727fcd16fa6c9e60b.mockapi.io/contact', {
+            let res = await fetch('https://contact-restful-api.vercel.app/contact', {
                 method: "POST",
                 headers: {
                     "Content-Type": 'application/json'

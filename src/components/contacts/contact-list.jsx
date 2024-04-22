@@ -8,9 +8,9 @@ export default function ContactList() {
     useEffect(() => {
         async function fetchContactList() {
             setIsLoading(true)
-            let res = await fetch('https://662274e727fcd16fa6c9e60b.mockapi.io/contact')
+            let res = await fetch('https://contact-restful-api.vercel.app/contact?_sort=id&_order=desc')
             let data = await res.json()
-            data = data.sort((contact_1, contact_2) => Number(contact_2.id) - Number(contact_1.id))
+            // data = data.sort((contact_1, contact_2) => Number(contact_2.id) - Number(contact_1.id))
             setContactList(data)
             setIsLoading(false)
         }

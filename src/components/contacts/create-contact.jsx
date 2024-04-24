@@ -10,7 +10,7 @@ import Loading from "../loading"
 const schema = yup
     .object({
         name: yup.string().required(),
-        phoneNumber: yup.string().required(),
+        phonenumber: yup.string().required(),
         mobilePhone: yup.string().required(),
         department: yup.string().required(),
         jobTitle: yup.string().required(),
@@ -131,11 +131,11 @@ export default function CreateContact() {
                                 <label className="form-label">Phone Number</label>
                                 <input
                                     type="tel"
-                                    className={`form-control ${errors.phoneNumber?.message ? 'is-invalid' : ''}`}
+                                    className={`form-control ${errors.phonenumber?.message ? 'is-invalid' : ''}`}
                                     placeholder="Phone Number..."
-                                    {...register("phoneNumber")}
+                                    {...register("phonenumber")}
                                 />
-                                <span className="invalid-feedback">{errors.phoneNumber?.message}</span>
+                                <span className="invalid-feedback">{errors.phonenumber?.message}</span>
                             </div>
                             <div className="form-group mb-2">
                                 <label className="form-label">Mobile Phone</label>

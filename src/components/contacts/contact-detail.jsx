@@ -3,6 +3,9 @@ import { Link, useParams } from "react-router-dom"
 import { FaBirthdayCake } from "react-icons/fa";
 import dayjs from "dayjs";
 import Loading from "../loading";
+import axios from "axios";
+import axiosClient from "../../api-client/axios-client";
+import contactService from "../../services/contact-service";
 
 export default function ContactDetail() {
     const { contactid } = useParams()
@@ -11,14 +14,18 @@ export default function ContactDetail() {
     useEffect(() => {
         setIsLoading(true)
         async function fetchContactById() {
-            let res = await fetch(`https://contact-restful-api.vercel.app/contact/${contactid}`)
-            let data = await res.json()
+            // let res = await fetch(`https://contact-restful-api.vercel.app/contact/${contactid}`)
+            // let data = await res.json()
+            // let res = await axios.get(`https://contact-restful-api.vercel.app/contact/${contactid}`)
+            // setContactDetail(res?.data)
+
+            // let data = await axiosClient.get(`/contact/${contactid}`)
+            let data = await contactService.getContactById(contactid)
             setContactDetail(data)
             setIsLoading(false)
         }
         fetchContactById()
     }, [contactid])
-    console.log(contactDetail);
     return (
         <>
             {isLoading ? <Loading /> : (

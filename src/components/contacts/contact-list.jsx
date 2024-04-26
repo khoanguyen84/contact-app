@@ -8,6 +8,9 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { Modal } from "bootstrap";
 import ModifyContact from "./modify-contact";
+import axios from "axios";
+import axiosClient from "../../api-client/axios-client";
+import contactService from "../../services/contact-service";
 
 
 export default function ContactList() {
@@ -20,8 +23,11 @@ export default function ContactList() {
     useEffect(() => {
         async function fetchContactList() {
             setIsLoading(true)
-            let res = await fetch('https://contact-restful-api.vercel.app/contact?_sort=id&_order=desc')
-            let data = await res.json()
+            // let res = await fetch('https://contact-restful-api.vercel.app/contact?_sort=id&_order=desc')
+            // let data = await res.json()
+            // let res = await axios.get('https://contact-restful-api.vercel.app/contact?_sort=id&_order=desc')
+            // setContactList(res?.data)
+            let data = await axiosClient.get('/contact?_sort=id&_order=desc')
             setContactList(data)
             setIsLoading(false)
         }
@@ -40,10 +46,13 @@ export default function ContactList() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    let res = await fetch(`https://contact-restful-api.vercel.app/contact/${contact?.id}`, {
-                        method: "DELETE"
-                    })
-                    let data = await res.json()
+                    // let res = await fetch(`https://contact-restful-api.vercel.app/contact/${contact?.id}`, {
+                    //     method: "DELETE"
+                    // })
+                    // let data = await res.json()
+                    // let res = await axios.delete(`https://contact-restful-api.vercel.app/contact/${contact?.id}`)
+                    // let data = await axiosClient.delete(`/contact/${contact?.id}`)
+                    let data = await contactService.deleteContact(contact?.id)
                     toast.success('Contact removed success')
                     setRemoveContact(contact?.id)
                 } catch (error) {

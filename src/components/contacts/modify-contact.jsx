@@ -6,6 +6,9 @@ import dayjs from "dayjs";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import Loading from "../loading";
+import axios from "axios";
+import axiosClient from "../../api-client/axios-client";
+import contactService from "../../services/contact-service";
 
 const schema = yup
     .object({
@@ -32,8 +35,16 @@ export default function ModifyContact({ modalRef, modifyContact, setIsModifyCont
     const { register, handleSubmit, reset, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
         mode: "onChange",
-        defaultValues: {
-            ...modifyContact
+        defaultValues: async () => {
+            // let res = await fetch(`https://contact-restful-api.vercel.app/contact/${modifyContact?.id}`)
+            // let contact = await res.json()
+            // let res = await axios.get(`https://contact-restful-api.vercel.app/contact/${modifyContact?.id}`)
+            // let data = await axiosClient.get(`/contact/${modifyContact?.id}`)
+            let data = await contactService.getContactById(modifyContact?.id)
+            return {
+                ...data,
+                dob: dayjs(data?.dob).format('YYYY-MM-DD')
+            }
         }
     })
 
@@ -45,17 +56,19 @@ export default function ModifyContact({ modalRef, modifyContact, setIsModifyCont
 
         try {
             setIsLoading(true)
-            let res = await fetch(`https://contact-restful-api.vercel.app/contact/${modifyContact?.id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": 'application/json'
-                },
-                body: JSON.stringify(values)
-            })
+            // let res = await fetch(`https://contact-restful-api.vercel.app/contact/${modifyContact?.id}`, {
+            //     method: "PUT",
+            //     headers: {
+            //         "Content-Type": 'application/json'
+            //     },
+            //     body: JSON.stringify(values)
+            // })
 
-            let result = await res.json()
-            if (Object.keys(result).length) {
-                console.log("result", result);
+            // let result = await res.json()
+            // let result = await axios.put(`https://contact-restful-api.vercel.app/contact/${modifyContact?.id}`, values)
+            // let data = await axiosClient.put(`/contact/${modifyContact?.id}`, values)
+            let data = await contactService.modifyContact(modifyContact?.id, values)
+            if (Object.keys(data).length) {
                 toast.success(`Contact modified success`)
                 reset()
                 hideModifyContact()
@@ -95,7 +108,6 @@ export default function ModifyContact({ modalRef, modifyContact, setIsModifyCont
                                             type="text"
                                             className={`form-control ${errors.name?.message ? 'is-invalid' : ''}`}
                                             placeholder="Name..."
-                                            defaultValue={modifyContact?.name}
                                             {...register("name")}
                                         />
                                         <span className="invalid-feedback">{errors.name?.message}</span>
@@ -107,7 +119,6 @@ export default function ModifyContact({ modalRef, modifyContact, setIsModifyCont
                                             className={`form-control ${errors.department?.message ? 'is-invalid' : ''}`}
                                             placeholder="Department..."
                                             {...register("department")}
-                                            defaultValue={modifyContact?.department}
                                         />
                                         <span className="invalid-feedback">{errors.department?.message}</span>
                                     </div>
@@ -118,7 +129,6 @@ export default function ModifyContact({ modalRef, modifyContact, setIsModifyCont
                                             className={`form-control ${errors.company?.message ? 'is-invalid' : ''}`}
                                             placeholder="Company..."
                                             {...register("company")}
-                                            defaultValue={modifyContact?.company}
                                         />
                                         <span className="invalid-feedback">{errors.company?.message}</span>
                                     </div>
@@ -129,7 +139,6 @@ export default function ModifyContact({ modalRef, modifyContact, setIsModifyCont
                                             className={`form-control ${errors.jobTitle?.message ? 'is-invalid' : ''}`}
                                             placeholder="Job Title..."
                                             {...register("jobTitle")}
-                                            defaultValue={modifyContact?.jobTitle}
                                         />
                                         <span className="invalid-feedback">{errors.jobTitle?.message}</span>
                                     </div>
@@ -140,7 +149,6 @@ export default function ModifyContact({ modalRef, modifyContact, setIsModifyCont
                                             className={`form-control ${errors.email?.message ? 'is-invalid' : ''}`}
                                             placeholder="email..."
                                             {...register("email")}
-                                            defaultValue={modifyContact?.email}
                                         />
                                         <span className="invalid-feedback">{errors.email?.message}</span>
                                     </div>
@@ -153,7 +161,6 @@ export default function ModifyContact({ modalRef, modifyContact, setIsModifyCont
                                             className={`form-control ${errors.dob?.message ? 'is-invalid' : ''}`}
                                             placeholder="Dob..."
                                             {...register("dob")}
-                                            defaultValue={dayjs(modifyContact?.dob).format('YYYY-MM-DD')}
                                         />
                                         <span className="invalid-feedback">{errors.dob?.message}</span>
                                     </div>
@@ -164,7 +171,6 @@ export default function ModifyContact({ modalRef, modifyContact, setIsModifyCont
                                             className={`form-control ${errors.phonenumber?.message ? 'is-invalid' : ''}`}
                                             placeholder="Phone Number..."
                                             {...register("phonenumber")}
-                                            defaultValue={modifyContact?.phonenumber}
                                         />
                                         <span className="invalid-feedback">{errors.phonenumber?.message}</span>
                                     </div>
@@ -175,7 +181,6 @@ export default function ModifyContact({ modalRef, modifyContact, setIsModifyCont
                                             className={`form-control ${errors.mobilePhone?.message ? 'is-invalid' : ''}`}
                                             placeholder="Mobile Phone..."
                                             {...register("mobilePhone")}
-                                            defaultValue={modifyContact?.mobilePhone}
                                         />
                                         <span className="invalid-feedback">{errors.mobilePhone?.message}</span>
                                     </div>
@@ -186,7 +191,6 @@ export default function ModifyContact({ modalRef, modifyContact, setIsModifyCont
                                             className={`form-control`}
                                             placeholder="Notes..."
                                             {...register('notes')}
-                                            defaultValue={modifyContact?.notes}
                                         />
                                     </div>
                                 </div>
@@ -202,7 +206,6 @@ export default function ModifyContact({ modalRef, modifyContact, setIsModifyCont
                                             placeholder="Avatar URL..."
                                             onInput={(e) => setAvatarUrl(e.target.value)}
                                             {...register('avatar')}
-                                            defaultValue={modifyContact?.avatar}
                                         />
                                     </div>
                                 </div>

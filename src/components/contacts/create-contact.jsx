@@ -6,6 +6,10 @@ import { useState } from "react"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
 import Loading from "../loading"
+import axios from "axios"
+import axiosClient from "../../api-client/axios-client"
+import contactService from "../../services/contact-service"
+import fileService from "../../services/file-service"
 
 const schema = yup
     .object({
@@ -23,7 +27,9 @@ const schema = yup
 
 export default function CreateContact() {
     const [avtarUrl, setAvatarUrl] = useState('')
+    const [fileAvatar, setFileAvatar] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
+    const [isUploading, setIsUploading] = useState(false)
     const navigate = useNavigate()
     const { register, handleSubmit, reset, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
@@ -32,17 +38,24 @@ export default function CreateContact() {
     const handleCreateContact = async (values) => {
         try {
             setIsLoading(true)
-            let res = await fetch('https://contact-restful-api.vercel.app/contact', {
-                method: "POST",
-                headers: {
-                    "Content-Type": 'application/json'
-                },
-                body: JSON.stringify(values)
+            // let res = await fetch('https://contact-restful-api.vercel.app/contact', {
+            //     method: "POST",
+            //     headers: {
+            //         "Content-Type": 'application/json'
+            //     },
+            //     body: JSON.stringify(values)
+            // })
+
+            // let result = await res.json()
+            // let result = await axios.post('https://contact-restful-api.vercel.app/contact', values)
+            // let data = await axiosClient.post('contact', values)
+
+            let data = await contactService.createConact({
+                ...values,
+                avatar: avtarUrl
             })
-
-            let result = await res.json()
-
-            if (Object.keys(result).length) {
+            console.log(data);
+            if (Object.keys(data).length) {
                 toast.success(`Contact created success`)
                 reset()
                 setAvatarUrl('')
@@ -58,6 +71,25 @@ export default function CreateContact() {
         navigate(-1, { replace: true })
     }
 
+    const handleChangeAvatar = (e) => {
+        const fakeAvatarUrl = URL.createObjectURL(e.target.files[0])
+        setAvatarUrl(fakeAvatarUrl)
+        setFileAvatar(e.target.files[0])
+    }
+
+    const handleUploadAvatar = async () => {
+
+        try {
+            setIsUploading(true)
+            let result = await fileService.uploadAvatar(fileAvatar)
+            console.log(result);
+            setAvatarUrl(result?.secure_url)
+            toast.success('Upload avatar succeed')
+        } catch (error) {
+            toast.error('Can not upload file, please try again!')
+        }
+        setIsUploading(false)
+    }
     return (
         <>
             <h3>Create Contact</h3>
@@ -159,9 +191,28 @@ export default function CreateContact() {
                         </div>
                         <div className="col-4">
                             <div className="form-group mb-2">
-                                <img src={avtarUrl || noAvatar} className='w-50' alt="" />
+                                <img role="button" src={avtarUrl || noAvatar} className='w-50' alt=""
+                                    onClick={() => document.getElementById('file_image').click()}
+                                />
                             </div>
-                            <div className="form-group mb-2">
+                            <input id='file_image' type="file" accept="image/*" className="d-none"
+                                onChange={handleChangeAvatar}
+                            />
+                            {
+                                isUploading ? (
+                                    <button className="btn btn-dark btn-sm" type="button" disabled>
+                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        Uploading...
+                                    </button>
+                                ) : (
+                                    <button type="button" className="btn btn-dark btn-sm"
+                                        onClick={handleUploadAvatar}
+                                    >Upload</button>
+                                )
+
+                            }
+
+                            {/* <div className="form-group mb-2">
                                 <label className="form-label">Avatar URL</label>
                                 <input
                                     type="url"
@@ -170,7 +221,7 @@ export default function CreateContact() {
                                     onInput={(e) => setAvatarUrl(e.target.value)}
                                     {...register('avatar')}
                                 />
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                     <div className='row'>
@@ -181,8 +232,9 @@ export default function CreateContact() {
                             >Cancel</button>
                         </div>
                     </div>
-                </form>
-            )}
+                </form >
+            )
+            }
 
         </>
     )
